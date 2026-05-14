@@ -1,20 +1,17 @@
 {
   // 总开关，false 时禁用所有通知
   "enabled": true,
-
   // 桌面弹窗通知（使用 notify-send）
   "desktop": {
     "enabled": true
   },
-
   // TUI 内部 Toast 提示
   "toast": {
-    "enabled": true,
+    "enabled": false,
     // 样式：info / success / error
     "variant": "info"
   },
-
-  // 语音铃声通知
+  // 语音铃声通知 
   "voice": {
     "enabled": true,
     // 模式：custom=自定义铃声 / default=系统铃声
@@ -23,20 +20,17 @@
     "player": "paplay",
     // 每次播放后权重衰减系数（0~1，越小衰减越快）
     "decayFactor": 0.7,
-
     // 系统默认铃声
     "defaultBell": {
-      "enabled": false
+      "enabled": false,
     },
-
     // 自定义铃声（从 musics 目录随机播放）
     "customVoice": {
       "enabled": true,
       // 铃声目录名（相对于插件所在目录）
-      "musicsDir": "musics"
-    }
+      "musicsDir": "musics",
+    },
   },
-
   // 按事件类型单独开关
   "events": {
     // 需要权限确认时通知
@@ -44,6 +38,6 @@
     // 回答结束等待输入时通知
     "session.idle": true,
     // 会话出错时通知
-    "session.error": true
-  }
+    "session.error": true,
+  },
 }

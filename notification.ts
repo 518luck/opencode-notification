@@ -172,9 +172,12 @@ class WeightManager {
   }
 }
 
-// 去除 JSONC 中的注释，使其可被 JSON.parse 解析
+// 去除 JSONC 中的注释和尾逗号，使其可被 JSON.parse 解析
 function stripJsoncComments(content: string): string {
-  return content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  return content
+    .replace(/\/\/.*$/gm, "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/,\s*([}\]])/g, "$1");
 }
 
 // 查找配置文件（支持 .jsonc 和 .json）
