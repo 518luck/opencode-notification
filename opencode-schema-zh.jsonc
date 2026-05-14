@@ -737,15 +737,15 @@
           "type": "string",
           "description": "用于配置校验的 JSON Schema 引用"
         },
-        "shell": {
+        "shell": { //终端和 bash 工具默认使用的 shell
           "type": "string",
           "description": "终端和 bash 工具默认使用的 shell"
         },
-        "logLevel": {
+        "logLevel": { //日志级别。日志文件中打印的信息繁简程度
           "$ref": "#/$defs/LogLevel",
           "description": "日志级别"
         },
-        "server": {
+        "server": { //用于 opencode serve 和 web 命令的服务器配置
           "$ref": "#/$defs/ServerConfig",
           "description": "用于 opencode serve 和 web 命令的服务器配置"
         },
@@ -818,34 +818,34 @@
           },
           "additionalProperties": false //watcher 里面只能写 ignore，不能写其他字段。
         },
-        "snapshot": {
+        "snapshot": { //快照追踪开关。OpenCode 用快照记录 agent 操作期间的文件变化，让会话内的 undo/revert 能回滚文件改动。
           "type": "boolean",
-          "description": "启用或禁用快照追踪。为 false 时不会记录文件系统快照，undo/revert 也无法撤销或重做文件变更。默认 true。"
+          "description": "启用或禁用快照追踪。为 false 时不会记录文件系统快照，undo/revert 也无法撤销或重做文件变更。默认 true。" //设为 false 可减少大仓库或多 submodule 项目的索引开销和磁盘占用，但 UI 里不能回滚 agent 改过的文件。
         },
-        "plugin": {
+        "plugin": { //插件配置。用于从 npm 加载 OpenCode 插件；本地插件通常放在 .opencode/plugins/ 或 ~/.config/opencode/plugins/ 自动加载。
           "type": "array",
-          "items": {
+          "items": { //plugin 数组里的每一项代表一个插件。
             "anyOf": [
               {
-                "type": "string"
+                "type": "string" //简单写法：只写 npm 包名，例如 "opencode-wakatime" 或 "@my-org/custom-plugin"。
               },
               {
-                "type": "array",
-                "prefixItems": [
+                "type": "array", //带配置写法：用二元数组表示 [插件包名, 插件配置对象]。
+                "prefixItems": [ //数组第 1 项必须是插件包名字符串，第 2 项必须是传给插件的配置对象。
                   {
-                    "type": "string"
+                    "type": "string" //插件 npm 包名。
                   },
                   {
-                    "type": "object"
+                    "type": "object" //该插件自己的配置对象，具体字段由插件自己定义。
                   }
                 ],
-                "maxItems": 2,
-                "minItems": 2
+                "maxItems": 2, //带配置写法必须刚好 2 项，不能多。
+                "minItems": 2 //带配置写法必须刚好 2 项，不能少。
               }
             ]
           }
         },
-        "share": {
+        "share": { //分享行为控制。决定新创建的对话是否自动分享、是否默认在 UI 里显示“分享”按钮
           "type": "string",
           "enum": [
             "manual",
@@ -854,235 +854,235 @@
           ],
           "description": "控制分享行为：'manual' 允许手动分享，'auto' 自动分享，'disabled' 完全禁用分享"
         },
-        "autoshare": {
+        "autoshare": { //废弃求了
           "type": "boolean",
           "description": "@deprecated 请改用 'share' 字段。自动分享新创建的会话"
         },
-        "autoupdate": {
+        "autoupdate": { //自动更新配置。控制 OpenCode 启动时是否自动下载新版本。
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "boolean" //true 表示自动更新；false 表示禁用自动更新。
             },
             {
               "type": "string",
               "enum": [
-                "notify"
+                "notify" //只显示更新通知，不自动下载安装。
               ]
             }
           ],
-          "description": "自动更新到最新版本。设为 true 自动更新，false 禁用，或 'notify' 仅显示更新通知"
+          "description": "自动更新到最新版本。设为 true 自动更新，false 禁用，或 'notify' 仅显示更新通知" //如果通过 Homebrew 等包管理器安装，notify 模式可能不适用。
         },
-        "disabled_providers": {
-          "type": "array",
+        "disabled_providers": { //禁用自动加载的 provider。即使环境变量或 /connect 已配置凭据，被禁用的 provider 也不会加载。
+          "type": "array", //provider 在 OpenCode 里指的是模型服务提供方
           "items": {
-            "type": "string"
+            "type": "string" //每一项是 provider ID，例如 "openai"、"gemini"。
           },
-          "description": "禁用那些会被自动加载的 provider"
+          "description": "禁用那些会被自动加载的 provider" //优先级高于 enabled_providers；被禁用后，该 provider 的模型不会出现在模型选择列表。
         },
-        "enabled_providers": {
-          "type": "array",
+        "enabled_providers": { // provider 白名单。设置后只启用这里列出的 provider，其他 provider 会被忽略。
+          "type": "array", //provider 在 OpenCode 里指的是模型服务提供方
           "items": {
-            "type": "string"
+            "type": "string" //每一项是允许启用的 provider ID。
           },
           "description": "设置后，仅启用这些 provider，其他 provider 会被忽略"
         },
-        "model": {
+        "model": { //默认主模型。OpenCode 主要对话、agent 执行任务时默认使用这个模型。
           "type": "string",
-          "description": "使用的模型，格式为 provider/model，例如 anthropic/claude-2",
+          "description": "使用的模型，格式为 provider/model，例如 anthropic/claude-2", //格式通常是 "provider/model"，例如 "anthropic/claude-sonnet-4-5"。
           "$ref": "https://models.dev/model-schema.json#/$defs/Model"
         },
-        "small_model": {
+        "small_model": { //默认小模型。用于标题生成等轻量任务，通常可以配置成更便宜、更快的模型。
           "type": "string",
-          "description": "用于标题生成等任务的小模型，格式为 provider/model",
+          "description": "用于标题生成等任务的小模型，格式为 provider/model", //如果不配置，OpenCode 会尝试使用同 provider 下更便宜的模型；没有可用小模型时回退到主 model。
           "$ref": "https://models.dev/model-schema.json#/$defs/Model"
         },
-        "default_agent": {
+        "default_agent": { //默认 agent。没有明确指定 agent 时，OpenCode 使用这个 agent 处理任务。
           "type": "string",
-          "description": "未显式指定时使用的默认 agent。必须是 primary agent。若未设置或无效，则回退到 'build'。"
+          "description": "未显式指定时使用的默认 agent。必须是 primary agent。若未设置或无效，则回退到 'build'。" //可以是内置 "build"、"plan"，也可以是你自定义的 primary agent；不能是 subagent。
         },
-        "username": {
+        "username": { //自定义会话显示用户名。用于替代系统用户名显示在对话里。
           "type": "string",
           "description": "会话中显示的自定义用户名，替代系统用户名"
         },
-        "mode": {
+        "mode": { //旧版 agent 配置字段，已废弃。现在应该使用 agent 字段。
           "type": "object",
           "properties": {
-            "build": {
+            "build": { //旧版 build agent 配置，结构仍然按 AgentConfig。
               "$ref": "#/$defs/AgentConfig"
             },
-            "plan": {
+            "plan": { //旧版 plan agent 配置，结构仍然按 AgentConfig。
               "$ref": "#/$defs/AgentConfig"
             }
           },
-          "additionalProperties": {
+          "additionalProperties": { //旧版也允许配置其他 agent 名称，每个值都必须符合 AgentConfig。
             "$ref": "#/$defs/AgentConfig"
           },
           "description": "@deprecated 请改用 `agent` 字段"
         },
-        "agent": {
+        "agent": { //Agent 配置入口。用于配置内置 agent 或自定义 agent 的模型、提示词、权限、模式等。
           "type": "object",
           "properties": {
-            "plan": {
+            "plan": { //内置 plan agent 配置，通常用于规划和只读分析。
               "$ref": "#/$defs/AgentConfig"
             },
-            "build": {
+            "build": { //内置 build agent 配置，通常用于实际修改代码和执行任务。
               "$ref": "#/$defs/AgentConfig"
             },
-            "general": {
+            "general": { //内置 general subagent 配置，通常用于通用辅助任务。
               "$ref": "#/$defs/AgentConfig"
             },
-            "explore": {
+            "explore": { //内置 explore subagent 配置，通常用于代码库探索和查找信息。
               "$ref": "#/$defs/AgentConfig"
             },
-            "scout": {
+            "scout": { //内置 scout agent 配置，通常用于参考资料、仓库或外部上下文检查。
               "$ref": "#/$defs/AgentConfig"
             },
-            "title": {
+            "title": { //内置 title agent 配置，通常用于生成会话标题等轻量任务。
               "$ref": "#/$defs/AgentConfig"
             },
-            "summary": {
+            "summary": { //内置 summary agent 配置，通常用于总结会话或上下文。
               "$ref": "#/$defs/AgentConfig"
             },
-            "compaction": {
+            "compaction": { //内置 compaction agent 配置，通常用于上下文压缩。
               "$ref": "#/$defs/AgentConfig"
             }
           },
-          "additionalProperties": {
+          "additionalProperties": { //允许自定义其他 agent 名称，每个 agent 的配置都必须符合 AgentConfig。
             "$ref": "#/$defs/AgentConfig"
           },
           "description": "Agent 配置，见 https://opencode.ai/docs/agents"
         },
-        "provider": {
+        "provider": { //Provider 配置入口。用于配置模型服务商、连接参数，以及该 provider 下的模型覆盖或补充。
           "type": "object",
-          "additionalProperties": {
+          "additionalProperties": { //provider 的键名是 provider ID；每个 provider 对象都必须符合 ProviderConfig。
             "$ref": "#/$defs/ProviderConfig"
           },
           "description": "自定义 provider 配置及模型覆盖"
         },
-        "mcp": {
+        "mcp": { //MCP 服务器配置入口。用于把外部工具、数据源或服务接入 OpenCode。
           "type": "object",
-          "additionalProperties": {
+          "additionalProperties": { //mcp 的键名是服务器名称，例如 "github"、"sentry"、"jira"；每个值是一台 MCP 服务器配置。
             "anyOf": [
               {
-                "anyOf": [
+                "anyOf": [ //完整服务器配置：可以是本地 MCP，也可以是远程 MCP。
                   {
-                    "$ref": "#/$defs/McpLocalConfig"
+                    "$ref": "#/$defs/McpLocalConfig" //本地 MCP：通过 command 在本机启动。
                   },
                   {
-                    "$ref": "#/$defs/McpRemoteConfig"
+                    "$ref": "#/$defs/McpRemoteConfig" //远程 MCP：通过 url 连接远程服务器。
                   }
                 ]
               },
               {
-                "type": "object",
+                "type": "object", //简写配置：只覆盖 enabled 开关，常用于启用或禁用远程组织配置里的 MCP。
                 "properties": {
-                  "enabled": {
+                  "enabled": { //是否启用这个 MCP 服务器。
                     "type": "boolean"
                   }
                 },
-                "required": [
+                "required": [ //简写配置里 enabled 必填。
                   "enabled"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false //简写配置只能写 enabled。
               }
             ]
           },
           "description": "MCP（Model Context Protocol）服务器配置"
         },
-        "formatter": {
+        "formatter": { //格式化器配置。用于让 OpenCode 在修改文件后调用格式化工具，例如 prettier、gofmt、black 等。
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "boolean" //false 或省略表示禁用；true 表示启用内置格式化器配置。
             },
             {
               "type": "object",
-              "additionalProperties": {
+              "additionalProperties": { //对象写法：键名是格式化器名称；值是该格式化器的配置。
                 "type": "object",
                 "properties": {
-                  "disabled": {
+                  "disabled": { //是否禁用这个格式化器。常用于关闭某个内置格式化器。
                     "type": "boolean"
                   },
-                  "command": {
+                  "command": { //运行格式化器的命令和参数，例如 ["npx", "prettier", "--write", "$FILE"]。
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string" //命令数组里的每一项都是字符串参数。
                     }
                   },
-                  "environment": {
+                  "environment": { //运行格式化命令时附加的环境变量。
                     "type": "object",
                     "additionalProperties": {
-                      "type": "string"
+                      "type": "string" //环境变量的值必须是字符串。
                     }
                   },
-                  "extensions": {
+                  "extensions": { //该格式化器处理的文件扩展名列表，例如 [".js", ".ts", ".tsx"]。
                     "type": "array",
                     "items": {
-                      "type": "string"
+                      "type": "string" //每一项是一个文件扩展名字符串。
                     }
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false //单个 formatter 配置里只能写 disabled、command、environment、extensions。
               }
             }
           ],
           "description": "启用或配置格式化器。省略或设为 false 表示禁用，true 表示启用内置配置，对象表示在启用内置配置的基础上进行覆盖。"
         },
-        "lsp": {
+        "lsp": { //LSP 服务器配置。用于接入语言服务器，提供诊断、跳转定义、符号等代码智能能力。
           "anyOf": [
             {
-              "type": "boolean"
+              "type": "boolean" //false 或省略表示禁用；true 表示启用内置 LSP 配置。
             },
             {
               "type": "object",
-              "additionalProperties": {
+              "additionalProperties": { //对象写法：键名是 LSP 服务器名称；值是该 LSP 的禁用配置或自定义启动配置。
                 "anyOf": [
                   {
-                    "type": "object",
+                    "type": "object", //只禁用某个内置 LSP 的简写配置。
                     "properties": {
-                      "disabled": {
+                      "disabled": { //这里固定只能写 true，表示禁用该 LSP。
                         "type": "boolean",
                         "enum": [
                           true
                         ]
                       }
                     },
-                    "required": [
+                    "required": [ //禁用简写必须包含 disabled。
                       "disabled"
                     ],
-                    "additionalProperties": false
+                    "additionalProperties": false //禁用简写只能写 disabled。
                   },
                   {
-                    "type": "object",
+                    "type": "object", //自定义 LSP 启动配置。
                     "properties": {
-                      "command": {
+                      "command": { //启动语言服务器的命令和参数，例如 ["typescript-language-server", "--stdio"]。
                         "type": "array",
                         "items": {
-                          "type": "string"
+                          "type": "string" //命令数组里的每一项都是字符串参数。
                         }
                       },
-                      "extensions": {
+                      "extensions": { //这个 LSP 负责的文件扩展名列表，例如 [".ts", ".tsx"]。
                         "type": "array",
                         "items": {
-                          "type": "string"
+                          "type": "string" //每一项是一个文件扩展名字符串。
                         }
                       },
-                      "disabled": {
+                      "disabled": { //是否禁用这个自定义 LSP 配置。
                         "type": "boolean"
                       },
-                      "env": {
+                      "env": { //启动 LSP 时附加的环境变量。
                         "type": "object",
                         "additionalProperties": {
-                          "type": "string"
+                          "type": "string" //环境变量的值必须是字符串。
                         }
                       },
-                      "initialization": {
+                      "initialization": { //发送给语言服务器的初始化选项，具体结构由对应 LSP 决定。
                         "type": "object"
                       }
                     },
-                    "required": [
+                    "required": [ //自定义 LSP 配置里 command 必填。
                       "command"
                     ],
-                    "additionalProperties": false
+                    "additionalProperties": false //自定义 LSP 配置里只能写 command、extensions、disabled、env、initialization。
                   }
                 ]
               }
@@ -1090,14 +1090,14 @@
           ],
           "description": "启用或配置 LSP 服务器。省略或设为 false 表示禁用，true 表示启用内置配置，对象表示在启用内置配置的基础上进行覆盖。"
         },
-        "instructions": {
+        "instructions": { //额外 instruction/rules 文件列表。用于给模型加载项目规则、贡献指南、编码规范等上下文。
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string" //每一项是文件路径或 glob 模式，例如 "CONTRIBUTING.md"、"docs/guidelines.md"、".cursor/rules/*.md"。
           },
           "description": "额外引入的 instruction 文件或匹配模式"
         },
-        "layout": {
+        "layout": { // 废弃求了
           "$ref": "#/$defs/LayoutConfig",
           "description": "@deprecated 现在始终使用 stretch 布局"
         },
