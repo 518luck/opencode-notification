@@ -185,24 +185,40 @@
         }
       ]
     },
-    "AgentConfig": {
+    "AgentConfig": { //定义“一个 agent 配置对象”可以写哪些字段。
+      /*
+          实际写法大概像这样：
+          {
+            "agent": {
+              "reviewer": {
+                "description": "只负责代码审查",
+                "mode": "subagent",
+                "model": "openai/gpt-5",
+                "permission": {
+                  "edit": "deny",
+                  "bash": "ask"
+                }
+              }
+            }
+          }
+    */
       "type": "object",
       "properties": {
-        "model": {
+        "model": { // 这个 agent 默认使用哪个模型
           "type": "string",
           "$ref": "https://models.dev/model-schema.json#/$defs/Model"
         },
-        "variant": {
+        "variant": { //该模型默认用哪个变体
           "type": "string",
           "description": "该 agent 的默认模型变体（仅在使用该 agent 配置的模型时生效）"
         },
-        "temperature": {
+        "temperature": { //采样温度 控制模型输出随机性/发散度
+          "type": "number" //值越低：越稳定、越保守、越一致  值越高：越随机、越发散、越有变化
+        },
+        "top_p": { //采样参数 top_p  调“模型每一步允许从多大范围的候选词里选”
           "type": "number"
         },
-        "top_p": {
-          "type": "number"
-        },
-        "prompt": {
+        "prompt": { // 给这个 agent 追加或定制的提示词
           "type": "string"
         },
         "tools": {
@@ -212,62 +228,62 @@
           },
           "description": "@deprecated 请改用 'permission' 字段"
         },
-        "disable": {
+        "disable": { // 禁用该 agent 的功能
           "type": "boolean"
         },
-        "description": {
+        "description": { //描述该 agent 适合在什么场景下使用
           "type": "string",
           "description": "描述该 agent 适合在什么场景下使用"
         },
-        "mode": {
+        "mode": { // agent 的工作模式 / agent 类型
           "type": "string",
           "enum": [
-            "subagent",
-            "primary",
+            "subagent", //subagent，是主 agent 下面挂载的“插件”或“专家”
+            "primary", //主 agent
             "all"
           ]
         },
-        "hidden": {
-          "type": "boolean",
+        "hidden": { //在 @ 自动补全菜单中隐藏此 subagent（默认：false，仅适用于 mode: subagent）
+          "type": "boolean", //hidden: true 会把这个 subagent 从 @ 自动补全菜单里隐藏 适合那种“内部辅助 agent”
           "description": "在 @ 自动补全菜单中隐藏此 subagent（默认：false，仅适用于 mode: subagent）"
         },
-        "options": {
+        "options": { // 一些额外的配置选项，通常与模型或特定功能相关
           "type": "object"
         },
-        "color": {
+        "color": { // agent 在 UI 中的显示颜色
           "anyOf": [
             {
-              "pattern": "^#[0-9a-fA-F]{6}$",
+              "pattern": "^#[0-9a-fA-F]{6}$", //符合这个正则规则
               "type": "string"
             },
             {
               "type": "string",
-              "enum": [
-                "primary",
-                "secondary",
-                "accent",
-                "success",
-                "warning",
-                "error",
-                "info"
+              "enum": [ //预设名字
+                "primary", //主颜色
+                "secondary", //次颜色
+                "accent", //强调颜色
+                "success", //成功颜色
+                "warning", //警告颜色
+                "error", //错误颜色
+                "info" //信息颜色
               ]
             }
           ],
           "description": "十六进制颜色值（例如 #FF5733）或主题颜色（例如 primary）"
         },
-        "steps": {
+        "steps": { //一个 agent 最多能连续“自主调用工具并继续思考”多少轮，超过这个次数后，就不再继续跑工具流程，而是直接返回一段普通文字结果。
           "exclusiveMinimum": 0,
           "type": "integer",
           "maximum": 9007199254740991,
           "description": "在强制改为纯文本响应之前，允许的最大 agent 迭代次数"
         },
         "maxSteps": {
-          "exclusiveMinimum": 0,
+          "exclusiveMinimum": 0, //必须大于 0
           "type": "integer",
           "maximum": 9007199254740991,
           "description": "@deprecated 请改用 'steps' 字段"
         },
-        "permission": {
+        "permission": { // 定义 agent 可以执行的操作权限
           "$ref": "#/$defs/PermissionConfig"
         }
       }
