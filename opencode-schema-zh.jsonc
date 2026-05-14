@@ -1215,6 +1215,6 @@
       "additionalProperties": false // addititonal : 附加的 properties 属性
     }
   },
-  "allowComments": true,
-  "allowTrailingCommas": true
+  "allowComments": true, //允许配置文件里写注释。也就是支持 JSONC 里的 // 行注释和 /* 块注释 */，普通 JSON 标准本身不允许注释。
+  "allowTrailingCommas": true //允许对象或数组最后一项后面保留尾随逗号，方便增删配置项。
 }
