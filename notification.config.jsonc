@@ -7,7 +7,7 @@
   },
   // TUI 内部 Toast 提示
   "toast": {
-    "enabled": false,
+    "enabled": true,
     // 样式：info / success / error
     "variant": "info"
   },

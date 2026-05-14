@@ -215,6 +215,7 @@ function findSystemBell(): string | null {
 
 export const NotificationPlugin: Plugin = async ({
   $,
+  client,
   directory,
   worktree,
 }) => {
@@ -277,7 +278,12 @@ export const NotificationPlugin: Plugin = async ({
   async function sendToastNotification(message: string) {
     if (!config.toast.enabled) return;
     try {
-      await $`opencode tui toast ${message}`.quiet().nothrow();
+      await client.tui.showToast({
+        body: {
+          message,
+          variant: (config.toast.variant as "info" | "success" | "error") || "info",
+        },
+      });
     } catch {
       // TUI Toast 不可用时静默忽略
     }
