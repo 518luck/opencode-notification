@@ -174,16 +174,16 @@ class WeightManager {
 
 // 去除 JSONC 中的注释，使其可被 JSON.parse 解析
 function stripJsoncComments(content: string): string {
-  return content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "")
+  return content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
 }
 
 // 查找配置文件（支持 .jsonc 和 .json）
 function findConfigFile(dir: string): string | null {
-  const jsoncPath = join(dir, "notification.config.jsonc")
-  const jsonPath = join(dir, "notification.config.json")
-  if (existsSync(jsoncPath)) return jsoncPath
-  if (existsSync(jsonPath)) return jsonPath
-  return null
+  const jsoncPath = join(dir, "notification.config.jsonc");
+  const jsonPath = join(dir, "notification.config.json");
+  if (existsSync(jsoncPath)) return jsoncPath;
+  if (existsSync(jsonPath)) return jsonPath;
+  return null;
 }
 
 // 查找系统默认铃声
@@ -248,7 +248,10 @@ export const NotificationPlugin: Plugin = async ({
   }
 
   // 初始化铃声权重管理器
-  const musicsDir = join(pluginDir, config.voice.customVoice.musicsDir || "musics");
+  const musicsDir = join(
+    pluginDir,
+    config.voice.customVoice.musicsDir || "musics",
+  );
   if (!existsSync(musicsDir)) {
     mkdirSync(musicsDir, { recursive: true });
   }
