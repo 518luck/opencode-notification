@@ -1101,116 +1101,118 @@
           "$ref": "#/$defs/LayoutConfig",
           "description": "@deprecated 现在始终使用 stretch 布局"
         },
-        "permission": {
+        "permission": { //权限配置。
           "$ref": "#/$defs/PermissionConfig"
         },
-        "tools": {
+        "tools": { //工具使用配置。键名是工具名称，值是 boolean（true=允许，false=禁用）。
           "type": "object",
           "additionalProperties": {
             "type": "boolean"
           }
         },
-        "attachment": {
+        "attachment": { //附件处理配置，包括图片尺寸限制和缩放行为。
           "$ref": "#/$defs/AttachmentConfig",
           "description": "附件处理配置，包括图片尺寸限制和缩放行为"
         },
-        "enterprise": {
+        "enterprise": { //企业版配置。用于组织/企业部署场景，通常和集中配置、SSO、内部 AI gateway 等企业能力相关。
           "type": "object",
           "properties": {
-            "url": {
+            "url": { //企业版服务地址。用于指向组织提供的 OpenCode Enterprise 端点。
               "type": "string",
               "description": "企业版 URL"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false //enterprise 里面只能写 url，不能写其他字段。
         },
-        "tool_output": {
+        "tool_output": { //工具输出截断配置。用于控制 bash、读取文件、搜索等工具返回内容过长时的处理方式。
           "type": "object",
           "properties": {
-            "max_lines": {
-              "exclusiveMinimum": 0,
+            "max_lines": { //工具输出最多直接返回多少行；超过后完整输出会写入磁盘，只返回预览。
+              "exclusiveMinimum": 0, //必须大于 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "工具输出在被截断并写入磁盘前允许的最大行数（默认：2000）"
             },
-            "max_bytes": {
-              "exclusiveMinimum": 0,
+            "max_bytes": { //工具输出最多直接返回多少字节；超过后完整输出会写入磁盘，只返回预览。
+              "exclusiveMinimum": 0, //必须大于 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "工具输出在被截断并写入磁盘前允许的最大字节数（默认：51200）"
             }
           },
-          "additionalProperties": false,
+          "additionalProperties": false, //tool_output 里面只能写 max_lines 和 max_bytes。
           "description": "工具输出截断阈值。超过任一限制时，完整文本会写入截断目录，并返回一段预览。"
         },
-        "compaction": {
+        "compaction": { //上下文压缩配置。用于在会话上下文接近模型窗口上限时压缩旧内容，保留继续工作的关键信息。
           "type": "object",
           "properties": {
-            "auto": {
+            "auto": { //是否在上下文满时自动压缩。
               "type": "boolean",
               "description": "当上下文已满时自动执行压缩（默认：true）"
             },
-            "prune": {
+            "prune": { //是否清理/裁剪旧工具输出，以减少 token 占用。
               "type": "boolean",
               "description": "启用旧工具输出清理（默认：true）"
             },
-            "tail_turns": {
-              "minimum": 0,
+            "tail_turns": { //压缩时保留最近多少轮用户对话及其后的 assistant/tool 响应原文。
+              "minimum": 0, //可以为 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "压缩时按原文保留的最近用户轮次数量，包含其后的 assistant/tool 响应（默认：2）"
             },
-            "preserve_recent_tokens": {
-              "minimum": 0,
+            "preserve_recent_tokens": { //压缩后额外按原文保留最近内容的最大 token 数。
+              "minimum": 0, //可以为 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "压缩后按原文保留的最近轮次最大 token 数"
             },
-            "reserved": {
-              "minimum": 0,
+            "reserved": { //为压缩过程预留的 token 缓冲，避免压缩请求本身也挤爆上下文窗口。
+              "minimum": 0, //可以为 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "为压缩预留的 token 缓冲区，用于避免压缩过程中窗口溢出"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false //compaction 里面只能写 auto、prune、tail_turns、preserve_recent_tokens、reserved。
         },
-        "experimental": {
+        "experimental": { //实验性配置。这里的开关可能不稳定，升级后行为或字段可能变化。
           "type": "object",
           "properties": {
-            "disable_paste_summary": {
+            "disable_paste_summary": { //是否禁用粘贴内容摘要功能。
               "type": "boolean"
             },
-            "batch_tool": {
+            "batch_tool": { //是否启用 batch tool。  批处理工具 一次性发起一组工具调用
               "type": "boolean",
               "description": "启用 batch tool"
             },
-            "openTelemetry": {
+            //OpenTelemetry 是一个可观测性标准，用来收集程序运行时的追踪、指标、日志等数据。
+            // span 是一次 trace 里的一个小片段。可以理解成：
+            "openTelemetry": { //是否为 AI SDK 调用启用 OpenTelemetry 追踪 spans。
               "type": "boolean",
               "description": "为 AI SDK 调用启用 OpenTelemetry spans（使用 'experimental_telemetry' 标志）"
             },
-            "primary_tools": {
+            "primary_tools": { // 指定哪些工具只对 primary agents 可用，subagent 不可用。
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string" //每一项是工具名称。
               },
               "description": "仅对 primary agents 可用的工具"
             },
-            "continue_loop_on_deny": {
+            "continue_loop_on_deny": { //工具调用被拒绝后，是否继续 agent 循环而不是直接停下。
               "type": "boolean",
               "description": "当工具调用被拒绝时继续 agent 循环"
             },
-            "mcp_timeout": {
-              "exclusiveMinimum": 0,
+            "mcp_timeout": { //MCP 请求超时时间，单位毫秒。
+              "exclusiveMinimum": 0, //必须大于 0。
               "type": "integer",
               "maximum": 9007199254740991,
               "description": "模型上下文协议（MCP）请求的超时时间（毫秒）"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false //experimental 里面只能写这里列出的实验性字段。
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false // addititonal : 附加的 properties 属性
     }
   },
   "allowComments": true,
