@@ -6,3 +6,7 @@ build/
 .env
 .env.*
 !.env.example
+
+musics/*
+!musics/
+!musics/default.mp3
