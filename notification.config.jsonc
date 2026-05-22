@@ -24,11 +24,11 @@
     "defaultBell": {
       "enabled": false
     },
-    // 自定义铃声（从 musics 目录随机播放）
+    // 自定义铃声（从 assets/sound 目录随机播放）
     "customVoice": {
       "enabled": true,
       // 铃声目录名（相对于插件所在目录）
-      "musicsDir": "musics"
+      "musicsDir": "assets/sound"
     }
   },
   // 按事件类型单独开关

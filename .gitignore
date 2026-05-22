@@ -7,6 +7,6 @@ build/
 .env.*
 !.env.example
 
-musics/*
-!musics/
-!musics/default.mp3
+assets/sound/*
+!assets/sound/
+!assets/sound/default.mp3

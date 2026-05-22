@@ -42,7 +42,7 @@ export function createVoiceNotifier(
 ) {
   const musicsDir = join(
     pluginDir,
-    config.voice.customVoice.musicsDir || "musics",
+    config.voice.customVoice.musicsDir || "assets/sound",
   );
   if (!existsSync(musicsDir)) {
     mkdirSync(musicsDir, { recursive: true });

@@ -50,7 +50,7 @@ export const DEFAULT_CONFIG: NotificationConfig = {
     player: "paplay",
     decayFactor: 0.7,
     defaultBell: { enabled: false },
-    customVoice: { enabled: true, musicsDir: "musics" },
+    customVoice: { enabled: true, musicsDir: "assets/sound" },
   },
   events: {
     "permission.asked": true, // v2
