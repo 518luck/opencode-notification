@@ -75,7 +75,11 @@ export function createDesktopNotifier(
     if (isDir(resolved)) {
       let picker = imagePickers.get(resolved);
       if (!picker) {
-        picker = new WeightedPicker(resolved, IMAGE_EXTENSIONS, imageDecayFactor);
+        picker = new WeightedPicker(
+          resolved,
+          IMAGE_EXTENSIONS,
+          imageDecayFactor,
+        );
         imagePickers.set(resolved, picker);
       }
       const picked = picker.pick();
