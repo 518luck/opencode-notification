@@ -1,7 +1,7 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { EVENT_MESSAGES } from "./src/constants";
-import { loadNotificationConfig } from "./src/utils";
-import { createNotifier } from "./src/notifier";
+import { createNotifier } from "./app/features/notifier/notifier";
+import { EVENT_MESSAGES } from "./app/shared/constants";
+import { loadNotificationConfig } from "./app/shared/utils";
 
 const pluginDir = import.meta.dir;
 

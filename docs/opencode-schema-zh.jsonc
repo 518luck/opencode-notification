@@ -103,7 +103,7 @@
       "additionalProperties": {
         //例如
         // {
-        //   "src/**": "allow",
+        //   "app/**": "allow",
         //   ".env": "deny"
         // }
         "$ref": "#/$defs/PermissionActionConfig"

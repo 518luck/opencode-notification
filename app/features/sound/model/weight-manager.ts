@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
-import { AUDIO_EXTENSIONS } from "./constants";
+import { AUDIO_EXTENSIONS } from "../../../shared/constants";
 
 export class WeightManager {
   private weightsPath: string;

@@ -1,7 +1,7 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { EVENT_MESSAGES } from "./constants";
-import { createVoiceNotifier } from "./sound";
-import type { NotificationConfig } from "./types";
+import { createVoiceNotifier } from "../sound/sound";
+import { EVENT_MESSAGES } from "../../shared/constants";
+import type { NotificationConfig } from "../../shared/types";
 
 type ToastVariant = "info" | "success" | "error";
 

@@ -1,17 +1,17 @@
 # OpenCode 通知插件源码结构与流程说明
 
-本目录（`src/`）包含 OpenCode 通知插件的核心实现逻辑。该插件主要负责监听 OpenCode 的系统事件（如任务完成、出错或权限申请），并以**桌面系统通知**、**编辑器内 Toast 弹窗**和**声音/自定义语音播放**的方式对用户进行提醒。
+本目录（`app/`）包含 OpenCode 通知插件的核心实现逻辑。该插件主要负责监听 OpenCode 的系统事件（如任务完成、出错或权限申请），并以**桌面系统通知**、**编辑器内 Toast 弹窗**和**声音/自定义语音播放**的方式对用户进行提醒。
 
 ---
 
 ## 目录结构说明
 
-* [constants.ts](file:///home/duoyun/idea/idea/opencode-notification/src/constants.ts)：定义了各事件状态提示词、支持的音频格式、Linux 内置铃声查找白名单路径以及默认配置。
-* [types.ts](file:///home/duoyun/idea/idea/opencode-notification/src/types.ts)：声明了插件的配置接口定义。
-* [utils.ts](file:///home/duoyun/idea/idea/opencode-notification/src/utils.ts)：提供通用工具函数，如加载和解析配置文件（支持 `.jsonc` 和 `.json`），当解析出错时自动进行默认值降级。
-* [notifier.ts](file:///home/duoyun/idea/idea/opencode-notification/src/notifier.ts)：通知器的分发中心，实现多通道（Desktop, Toast, Voice）通知的触发逻辑。
-* [sound.ts](file:///home/duoyun/idea/idea/opencode-notification/src/sound.ts)：声音通知实现，支持 Linux 默认系统铃声的路径探测与播放，以及自定义语音目录的挂载。
-* [weight-manager.ts](file:///home/duoyun/idea/idea/opencode-notification/src/weight-manager.ts)：自定义语音播放列表的权重控制器。负责轮询、去重以及音频权重的衰减，防止同一首提示音被连续重复播放。
+* [shared/constants.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/constants.ts)：定义了各事件状态提示词、支持的音频格式、Linux 内置铃声查找白名单路径以及默认配置。
+* [shared/types.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/types.ts)：声明了插件的配置接口定义。
+* [shared/utils.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/utils.ts)：提供通用工具函数，如加载和解析配置文件（支持 `.jsonc` 和 `.json`），当解析出错时自动进行默认值降级。
+* [features/notifier/notifier.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/notifier/notifier.ts)：通知器的分发中心，实现多通道（Desktop, Toast, Voice）通知的触发逻辑。
+* [features/sound/sound.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/sound.ts)：声音通知实现，支持 Linux 默认系统铃声的路径探测与播放，以及自定义语音目录的挂载。
+* [features/sound/model/weight-manager.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/model/weight-manager.ts)：自定义语音播放列表的权重控制器。负责轮询、去重以及音频权重的衰减，防止同一首提示音被连续重复播放。
 
 ---
 
@@ -79,7 +79,7 @@ graph TD
 
 ### 3. 音效权重管理机制（针对自定义语音模式）
 
-为了确保自定义目录下的音乐播放更加丰富且分布均匀，[WeightManager](file:///home/duoyun/idea/idea/opencode-notification/src/weight-manager.ts#L5) 采用权重轮询调度机制：
+为了确保自定义目录下的音乐播放更加丰富且分布均匀，[WeightManager](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/model/weight-manager.ts#L5) 采用权重轮询调度机制：
 
 ```mermaid
 graph TD

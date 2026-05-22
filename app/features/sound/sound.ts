@@ -5,9 +5,9 @@ import {
   AUDIO_EXTENSIONS,
   SYSTEM_BELL_FILES,
   SYSTEM_SOUND_PATHS,
-} from "./constants";
-import type { NotificationConfig } from "./types";
-import { WeightManager } from "./weight-manager";
+} from "../../shared/constants";
+import type { NotificationConfig } from "../../shared/types";
+import { WeightManager } from "./model/weight-manager";
 
 // 查找系统自带的铃声音频文件（支持精准白名单匹配与目录扫描降级）
 function findSystemBell(): string | null {
