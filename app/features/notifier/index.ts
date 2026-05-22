@@ -16,6 +16,7 @@ export function createNotifier(
     config.events,
     config.desktop.enabled,
     config.desktop.showImage,
+    config.desktop.imageDecayFactor,
     pluginDir,
   );
   const sendToast = createToastNotifier(client, config);

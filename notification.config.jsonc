@@ -5,7 +5,9 @@
   "desktop": {
     "enabled": true,
     // 是否显示左侧大图
-    "showImage": true
+    "showImage": true,
+    // 图片随机权重衰减因子（0~1，越小衰减越快，仅在 image 传文件夹时生效）
+    "imageDecayFactor": 0.7
   },
   // TUI 内部 Toast 提示
   "toast": {
@@ -35,8 +37,13 @@
   },
   // 按事件类型单独配置
   // enabled: 是否通知
-  // icon: 自定义小图标路径（可选，不填则用默认映射 assets/icons/{name}.svg）
-  // image: 自定义大图路径（可选，不填则同 icon）
+  // icon: 自定义小图标（支持三种写法，见下方示例）
+  // image: 自定义大图（支持三种写法，见下方示例）
+  //
+  // icon/image 的值支持三种写法：
+  //   1. 单文件路径："assets/icons/permission.svg" 或 "/home/user/pic.jpg"
+  //   2. 文件夹路径："assets/icons/permission/" （随机展示，带权重衰减）
+  //   3. 不填：使用默认映射（assets/icons/{name}.svg）
   "events": {
     // 需要权限确认时通知
     "permission.asked": {

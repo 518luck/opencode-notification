@@ -18,6 +18,16 @@ export const EVENT_ICONS: Record<string, string> = {
   "session.error": "error",
 };
 
+// 图片后缀白名单
+export const IMAGE_EXTENSIONS = [
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".svg",
+  ".gif",
+  ".webp",
+];
+
 // 音频后缀白名单
 export const AUDIO_EXTENSIONS = [
   ".wav",
@@ -51,7 +61,7 @@ export const SYSTEM_BELL_FILES = [
 // 默认配置
 export const DEFAULT_CONFIG: NotificationConfig = {
   enabled: true, // 总开关，false 时禁用所有通知通道（桌面、Toast、声音）
-  desktop: { enabled: true, showImage: true }, // 桌面通知开关 + 是否显示左侧大图
+  desktop: { enabled: true, showImage: true, imageDecayFactor: 0.7 }, // 桌面通知开关 + 是否显示左侧大图 + 图片随机权重衰减因子
   toast: { enabled: true, variant: "info" }, // TUI Toast 开关 + 样式（info/success/error）
   voice: {
     enabled: true, // 声音通知开关

@@ -6,7 +6,7 @@ export interface EventConfig {
 
 export interface NotificationConfig {
   enabled: boolean;
-  desktop: { enabled: boolean; showImage: boolean };
+  desktop: { enabled: boolean; showImage: boolean; imageDecayFactor: number };
   toast: { enabled: boolean; variant: string };
   voice: {
     enabled: boolean;
