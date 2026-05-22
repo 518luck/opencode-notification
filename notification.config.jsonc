@@ -33,17 +33,30 @@
       "musicsDir": "assets/sound"
     }
   },
-  // 按事件类型单独开关
+  // 按事件类型单独配置
+  // enabled: 是否通知
+  // icon: 自定义小图标路径（可选，不填则用默认映射 assets/icons/{name}.svg）
+  // image: 自定义大图路径（可选，不填则同 icon）
   "events": {
     // 需要权限确认时通知
-    "permission.asked": true, // v2
+    "permission.asked": {
+      "enabled": true
+    },
     // 兼容旧版 SDK 的权限事件名
-    "permission.updated": true,
+    "permission.updated": {
+      "enabled": true
+    },
     // OpenCode/agent 需要你回答问题时通知
-    "question.asked": true, // v2
+    "question.asked": {
+      "enabled": true
+    },
     // 回答结束等待输入时通知
-    "session.idle": true,
+    "session.idle": {
+      "enabled": true
+    },
     // 会话出错时通知
-    "session.error": true
+    "session.error": {
+      "enabled": true
+    }
   }
 }

@@ -2,7 +2,7 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { createVoiceNotifier } from "../sound/sound";
 import { EVENT_MESSAGES } from "../../shared/constants";
 import type { NotificationConfig } from "../../shared/types";
-import { createDesktopNotifier } from "./desktop";
+import { createDesktopNotifier, isEventEnabled } from "./desktop";
 import { createToastNotifier } from "./toast";
 
 export function createNotifier(
@@ -11,14 +11,20 @@ export function createNotifier(
   pluginDir: string,
 ) {
   const { $, client } = input;
-  const sendDesktop = createDesktopNotifier($, config, pluginDir);
+  const sendDesktop = createDesktopNotifier(
+    $,
+    config.events,
+    config.desktop.enabled,
+    config.desktop.showImage,
+    pluginDir,
+  );
   const sendToast = createToastNotifier(client, config);
   const notifyVoice = createVoiceNotifier($, config, pluginDir);
 
   return {
     async notify(eventType: string) {
       if (!config.enabled) return;
-      if (!config.events[eventType]) return;
+      if (!isEventEnabled(config.events[eventType])) return;
 
       const message = EVENT_MESSAGES[eventType] || "OpenCode 通知";
 

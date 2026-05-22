@@ -61,11 +61,11 @@ export const DEFAULT_CONFIG: NotificationConfig = {
     defaultBell: { enabled: false }, // 系统默认铃声开关
     customVoice: { enabled: true, musicsDir: "assets/sound" }, // 自定义铃声开关 + 音频目录（相对于插件根目录）
   },
-  events: { // 按事件类型单独开关，true=通知 / false=静默
-    "permission.asked": true, // v2
-    "permission.updated": true,
-    "question.asked": true, // v2
-    "session.idle": true,
-    "session.error": true,
+  events: { // 按事件类型单独配置，enabled=是否通知，icon/image=自定义图标路径（可选）
+    "permission.asked": { enabled: true }, // v2
+    "permission.updated": { enabled: true },
+    "question.asked": { enabled: true }, // v2
+    "session.idle": { enabled: true },
+    "session.error": { enabled: true },
   },
 };
