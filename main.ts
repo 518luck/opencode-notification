@@ -1,6 +1,6 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { EVENT_MESSAGES } from "./src/constants";
-import { loadNotificationConfig } from "./src/load-config";
+import { loadNotificationConfig } from "./src/utils";
 import { createNotifier } from "./src/notifier";
 
 const pluginDir = import.meta.dir;
@@ -17,6 +17,7 @@ const pluginDir = import.meta.dir;
 //   serverUrl: URL;              // 当前 opencode server 的 URL
 //   $: BunShell;                 // Bun Shell API，用来执行 shell 命令，比如 $\\notify-send ...\``
 // };
+
 // 插件的初始化回调函数，加载配置并创建通知器实例
 export const NotificationPlugin = (async (input) => {
   const config = loadNotificationConfig(pluginDir);

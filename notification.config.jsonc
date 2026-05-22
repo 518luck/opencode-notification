@@ -34,7 +34,11 @@
   // 按事件类型单独开关
   "events": {
     // 需要权限确认时通知
-    "permission.asked": true,
+    "permission.asked": true, // v2
+    // 兼容旧版 SDK 的权限事件名
+    "permission.updated": true,
+    // OpenCode/agent 需要你回答问题时通知
+    "question.asked": true, // v2
     // 回答结束等待输入时通知
     "session.idle": true,
     // 会话出错时通知

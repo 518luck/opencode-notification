@@ -2,7 +2,9 @@ import type { NotificationConfig } from "./types";
 
 // 事件消息定义
 export const EVENT_MESSAGES: Record<string, string> = {
-  "permission.asked": "需要权限确认，请查看终端",
+  "permission.asked": "需要权限确认，请查看终端", // v2
+  "permission.updated": "需要权限确认，请查看终端",
+  "question.asked": "OpenCode 有问题需要你回答", // v2
   "session.idle": "任务完成，等待你的输入",
   "session.error": "会话出错，请检查",
 };
@@ -51,7 +53,9 @@ export const DEFAULT_CONFIG: NotificationConfig = {
     customVoice: { enabled: true, musicsDir: "musics" },
   },
   events: {
-    "permission.asked": true,
+    "permission.asked": true, // v2
+    "permission.updated": true,
+    "question.asked": true, // v2
     "session.idle": true,
     "session.error": true,
   },
