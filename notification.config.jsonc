@@ -7,7 +7,9 @@
     // 是否显示左侧大图
     "showImage": true,
     // 图片随机权重衰减因子（0~1，越小衰减越快，仅在 image 传文件夹时生效）
-    "imageDecayFactor": 0.7
+    "imageDecayFactor": 0.7,
+    // 应用名称（显示在系统通知中心）
+    "appName": "OpenCode"
   },
   // TUI 内部 Toast 提示
   "toast": {

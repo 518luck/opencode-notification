@@ -36,6 +36,8 @@ export function createDesktopNotifier(
   desktopEnabled: boolean,
   showImage: boolean,
   imageDecayFactor: number,
+  appName: string,
+  projectName: string,
   pluginDir: string,
 ) {
   const imagePickers = new Map<string, WeightedPicker>();
@@ -111,7 +113,7 @@ export function createDesktopNotifier(
       args.push("-h", `string:image-path:${imagePath}`);
     }
 
-    args.push("OpenCode", message);
+    args.push("-a", appName, "OpenCode", message);
 
     try {
       await $`${args}`.quiet();
