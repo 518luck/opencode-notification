@@ -40,6 +40,14 @@ export const AUDIO_EXTENSIONS = [
   ".opus",
 ];
 
+// 音频播放器候选列表，配置的 player 不可用时会按顺序自动回退
+export const AUDIO_PLAYER_CANDIDATES = [
+  "pw-play",
+  "paplay",
+  "aplay",
+  "ffplay",
+];
+
 // 系统声音查找目录（白名单），用于适配不同 Linux 发行版和桌面环境的音频路径
 export const SYSTEM_SOUND_PATHS = [
   "/usr/share/sounds/",
@@ -66,7 +74,7 @@ export const DEFAULT_CONFIG: NotificationConfig = {
   voice: {
     enabled: true, // 声音通知开关
     mode: "custom", // 模式：custom=自定义铃声 / default=系统铃声
-    player: "paplay", // 音频播放器（paplay/aplay/ffplay）
+    player: "pw-play", // 首选音频播放器；找不到时自动回退到候选播放器
     decayFactor: 0.7, // 权重衰减系数（0~1，越小衰减越快）
     defaultBell: { enabled: false }, // 系统默认铃声开关
     customVoice: { enabled: true, musicsDir: "assets/sound" }, // 自定义铃声开关 + 音频目录（相对于插件根目录）
