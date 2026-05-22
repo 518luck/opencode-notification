@@ -6,11 +6,11 @@ import { createDesktopNotifier, isEventEnabled } from "./desktop";
 import { createToastNotifier } from "./toast";
 
 export function createNotifier(
-  input: Pick<PluginInput, "$" | "client">,
+  input: Pick<PluginInput, "$" | "client" | "project">,
   config: NotificationConfig,
   pluginDir: string,
 ) {
-  const { $, client } = input;
+  const { $, client, project } = input;
   const sendDesktop = createDesktopNotifier(
     $,
     config.events,
@@ -18,6 +18,7 @@ export function createNotifier(
     config.desktop.showImage,
     config.desktop.imageDecayFactor,
     config.desktop.appName,
+    project.name,
     pluginDir,
   );
   const sendToast = createToastNotifier(client, config);

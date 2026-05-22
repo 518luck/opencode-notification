@@ -113,7 +113,7 @@ export function createDesktopNotifier(
       args.push("-h", `string:image-path:${imagePath}`);
     }
 
-    args.push("-a", appName, "OpenCode", message);
+    args.push("-a", appName, projectName, message);
 
     try {
       await $`${args}`.quiet();
