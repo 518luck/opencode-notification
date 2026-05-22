@@ -3,7 +3,9 @@
   "enabled": true,
   // 桌面弹窗通知（使用 notify-send）
   "desktop": {
-    "enabled": true
+    "enabled": true,
+    // 是否显示左侧大图
+    "showImage": true
   },
   // TUI 内部 Toast 提示
   "toast": {

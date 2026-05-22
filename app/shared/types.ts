@@ -1,6 +1,6 @@
 export interface NotificationConfig {
   enabled: boolean;
-  desktop: { enabled: boolean };
+  desktop: { enabled: boolean; showImage: boolean };
   toast: { enabled: boolean; variant: string };
   voice: {
     enabled: boolean;
