@@ -22,14 +22,14 @@
     "decayFactor": 0.7,
     // 系统默认铃声
     "defaultBell": {
-      "enabled": false,
+      "enabled": false
     },
     // 自定义铃声（从 musics 目录随机播放）
     "customVoice": {
       "enabled": true,
       // 铃声目录名（相对于插件所在目录）
-      "musicsDir": "musics",
-    },
+      "musicsDir": "musics"
+    }
   },
   // 按事件类型单独开关
   "events": {
@@ -38,6 +38,6 @@
     // 回答结束等待输入时通知
     "session.idle": true,
     // 会话出错时通知
-    "session.error": true,
-  },
+    "session.error": true
+  }
 }
