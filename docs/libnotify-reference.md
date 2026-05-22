@@ -28,6 +28,16 @@
 
 优先级：`image-data` > `image-path` > `app_icon`
 
+### 建议尺寸
+
+| 类型 | 建议尺寸 | 格式 | 说明 |
+|------|----------|------|------|
+| `-i` 小图标 | **48×48 px** | PNG 或 SVG | GNOME 自动缩放，SVG 最佳 |
+| `-h string:image-path` 大图 | **128×128 px** | PNG 或 SVG | 超过会被缩放，SVG 最佳 |
+| @2x 高分屏预留 | 小图标 96px / 大图 256px | PNG | SVG 无需预留 |
+
+建议优先使用 SVG（矢量图，任意尺寸都清晰，GNOME 自动适配）。
+
 ### image-path 示例
 
 ```bash

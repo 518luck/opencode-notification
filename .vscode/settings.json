@@ -1,0 +1,12 @@
+{
+  "files.associations": {
+    "*.svg": "xml"
+  },
+  "prettier.documentSelectors": [
+    "**/*.svg"
+  ],
+  "[xml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  }
+}
