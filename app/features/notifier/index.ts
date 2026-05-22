@@ -2,8 +2,8 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { createVoiceNotifier } from "../sound/sound";
 import { EVENT_MESSAGES } from "../../shared/constants";
 import type { NotificationConfig } from "../../shared/types";
-
-type ToastVariant = "info" | "success" | "error";
+import { createDesktopNotifier } from "./desktop";
+import { createToastNotifier } from "./toast";
 
 // 创建并初始化通知器实例，整合桌面、TUI 弹窗及声音通知通道
 export function createNotifier(
@@ -12,32 +12,9 @@ export function createNotifier(
   pluginDir: string,
 ) {
   const { $, client } = input;
+  const sendDesktop = createDesktopNotifier($, config);
+  const sendToast = createToastNotifier(client, config);
   const notifyVoice = createVoiceNotifier($, config, pluginDir);
-
-  // 发送系统级桌面通知（通过 notify-send）
-  async function sendDesktopNotification(message: string) {
-    if (!config.desktop.enabled) return;
-    try {
-      await $`notify-send "OpenCode" ${message}`.quiet();
-    } catch {
-      // Desktop notifications are best-effort.
-    }
-  }
-
-  // 发送编辑器内 TUI 界面 Toast 提示消息
-  async function sendToastNotification(message: string) {
-    if (!config.toast.enabled) return;
-    try {
-      await client.tui.showToast({
-        body: {
-          message,
-          variant: (config.toast.variant as ToastVariant) || "info",
-        },
-      });
-    } catch {
-      // TUI may be unavailable depending on how opencode is running.
-    }
-  }
 
   return {
     // 触发指定事件类型的通知，自动分发到所有已启用的通知通道
@@ -47,8 +24,8 @@ export function createNotifier(
 
       const message = EVENT_MESSAGES[eventType] || "OpenCode 通知";
 
-      await sendDesktopNotification(message);
-      await sendToastNotification(message);
+      await sendDesktop(message);
+      await sendToast(message);
       await notifyVoice();
     },
   };

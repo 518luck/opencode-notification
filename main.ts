@@ -1,5 +1,5 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { createNotifier } from "./app/features/notifier/notifier";
+import { createNotifier } from "./app/features/notifier";
 import { EVENT_MESSAGES } from "./app/shared/constants";
 import { loadNotificationConfig } from "./app/shared/utils";
 
