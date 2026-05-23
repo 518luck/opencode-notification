@@ -1,7 +1,17 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { DEFAULT_CONFIG } from "./constants";
-import type { NotificationConfig } from "./types";
+import type { EventConfig, NotificationConfig } from "./types";
+
+export function isEventEnabled(eventConfig: EventConfig | undefined): boolean {
+  return eventConfig?.enabled === true;
+}
+
+export function getEventConfig(
+  eventConfig: EventConfig | undefined,
+): EventConfig | null {
+  return eventConfig || null;
+}
 
 export function scanFiles(dir: string, extensions: string[]): string[] {
   if (!existsSync(dir)) return [];

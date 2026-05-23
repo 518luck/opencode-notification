@@ -2,7 +2,8 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { createVoiceNotifier } from "../sound/sound";
 import { EVENT_MESSAGES } from "../../shared/constants";
 import type { NotificationConfig } from "../../shared/types";
-import { createDesktopNotifier, isEventEnabled } from "./desktop";
+import { isEventEnabled } from "../../shared/utils";
+import { createDesktopNotifier } from "./desktop";
 import { createToastNotifier } from "./toast";
 
 export function createNotifier(
@@ -37,7 +38,7 @@ export function createNotifier(
 
       await sendDesktop(message, eventType);
       await sendToast(message);
-      await notifyVoice();
+      await notifyVoice(eventType);
     },
   };
 }

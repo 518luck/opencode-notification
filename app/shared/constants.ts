@@ -73,17 +73,14 @@ export const DEFAULT_CONFIG: NotificationConfig = {
   toast: { enabled: true, variant: "info" }, // TUI Toast 开关 + 样式（info/success/error）
   voice: {
     enabled: true, // 声音通知开关
-    mode: "custom", // 模式：custom=自定义铃声 / default=系统铃声
     player: "pw-play", // 首选音频播放器；找不到时自动回退到候选播放器
-    decayFactor: 0.7, // 权重衰减系数（0~1，越小衰减越快）
-    defaultBell: { enabled: false }, // 系统默认铃声开关
-    customVoice: { enabled: true, musicsDir: "assets/sound" }, // 自定义铃声开关 + 音频目录（相对于插件根目录）
+    decayFactor: 0.7, // 事件语音目录的权重衰减系数（0~1，越小衰减越快）
   },
-  events: { // 按事件类型单独配置，enabled=是否通知，icon/image=自定义图标路径（可选）
-    "permission.asked": { enabled: true }, // v2
-    "permission.updated": { enabled: true },
-    "question.asked": { enabled: true }, // v2
-    "session.idle": { enabled: true },
-    "session.error": { enabled: true },
+  events: { // 按事件类型单独配置，enabled=是否通知，icon/image/voice=自定义资源路径（可选）
+    "permission.asked": { enabled: true, voice: "assets/sound/permission/" }, // v2
+    "permission.updated": { enabled: true, voice: "assets/sound/permission/" },
+    "question.asked": { enabled: true, voice: "assets/sound/question/" }, // v2
+    "session.idle": { enabled: true, voice: "assets/sound/session-idle/" },
+    "session.error": { enabled: true, voice: "assets/sound/session-error/" },
   },
 };

@@ -8,10 +8,11 @@
 
 * [shared/constants.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/constants.ts)：定义了各事件状态提示词、支持的音频格式、Linux 内置铃声查找白名单路径以及默认配置。
 * [shared/types.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/types.ts)：声明了插件的配置接口定义。
-* [shared/utils.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/utils.ts)：提供通用工具函数，如加载和解析配置文件（支持 `.jsonc` 和 `.json`），当解析出错时自动进行默认值降级。
-* [features/notifier/notifier.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/notifier/notifier.ts)：通知器的分发中心，实现多通道（Desktop, Toast, Voice）通知的触发逻辑。
-* [features/sound/sound.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/sound.ts)：声音通知实现，支持 Linux 默认系统铃声的路径探测与播放，以及自定义语音目录的挂载。
-* [features/sound/model/weight-manager.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/model/weight-manager.ts)：自定义语音播放列表的权重控制器。负责轮询、去重以及音频权重的衰减，防止同一首提示音被连续重复播放。
+* [shared/utils.ts](file:///home/duoyun/idea/idea/opencode-notification/app/shared/utils.ts)：提供通用工具函数，如加载和解析配置文件、事件配置读取、文件扫描以及带权重的随机文件选择。
+* [features/notifier/index.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/notifier/index.ts)：通知器的分发中心，实现多通道（Desktop, Toast, Voice）通知的触发逻辑。
+* [features/notifier/desktop.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/notifier/desktop.ts)：桌面通知实现，支持 notify-send 小图标、大图、应用名和项目名。
+* [features/notifier/toast.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/notifier/toast.ts)：OpenCode TUI Toast 弹窗通知实现。
+* [features/sound/sound.ts](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/sound.ts)：声音通知实现，支持每个事件单独配置音频文件或音频目录；目录会按权重随机播放，未配置时回退到系统默认铃声。
 
 ---
 
@@ -45,7 +46,7 @@ graph TD
     J2 -- 否 --> L2[略过]
     
     I3 --> J3{是否启用声音通知 config.voice.enabled?}
-    J3 -- 是 --> K3[根据声音配置模式播放声音]
+    J3 -- 是 --> K3[根据事件 voice 配置播放声音]
     J3 -- 否 --> L3[略过]
 ```
 
@@ -53,37 +54,33 @@ graph TD
 
 ### 2. 声音通知播放决策流程
 
-对于声音提醒通道，插件会根据配置的模式（系统铃声 `default` 或自定义语音 `custom`）执行不同的播放策略：
+对于声音提醒通道，插件会根据事件自身的 `voice` 配置执行播放策略：
 
 ```mermaid
 graph TD
-    A[声音通知 notifyVoice 被触发] --> B{播放模式 config.voice.mode?}
-    
-    B -- "custom (自定义语音)" --> C1[调用 playCustomVoice]
-    C1 --> C2{配置已启用且有音频文件?}
-    C2 -- 否 --> D1[结束播放流程]
-    C2 -- 是 --> C3[WeightManager.pick 随机挑选音频文件]
-    C3 --> C4[调用 player 命令行工具播放所选音频]
-    C4 --> C5[WeightManager.afterPlayed 衰减权重并更新记录]
-    
-    B -- "default (系统默认铃声)" --> E1[调用 playDefaultBell]
-    E1 --> E2{系统铃声配置已启用?}
-    E2 -- 否 --> F1[结束播放流程]
-    E2 -- 是 --> E3[findSystemBell 检索系统可用铃声文件]
-    E3 --> E4{是否找到可用铃声?}
-    E4 -- 否 --> F2[结束播放流程]
-    E4 -- 是 --> E5[调用 player 命令行工具播放系统铃声]
+    A[声音通知 notifyVoice eventType 被触发] --> B{事件是否配置 voice?}
+    B -- 否 --> E1[播放系统默认铃声]
+    B -- 是 --> C1{voice 是文件还是目录?}
+    C1 -- 文件 --> C2[直接播放该音频文件]
+    C1 -- 目录 --> C3[WeightedPicker 按权重随机挑选音频]
+    C3 --> C4[调用播放器播放所选音频]
+    C4 --> C5[播放成功后衰减权重并保存 .weights.json]
+    C1 -- 路径无效或目录为空 --> E1
+    E1 --> E2[findSystemBell 检索系统可用铃声文件]
+    E2 --> E3{是否找到可用铃声?}
+    E3 -- 否 --> F1[结束播放流程]
+    E3 -- 是 --> E4[调用播放器播放系统铃声]
 ```
 
 ---
 
-### 3. 音效权重管理机制（针对自定义语音模式）
+### 3. 音效权重管理机制（针对事件语音目录）
 
-为了确保自定义目录下的音乐播放更加丰富且分布均匀，[WeightManager](file:///home/duoyun/idea/idea/opencode-notification/app/features/sound/model/weight-manager.ts#L5) 采用权重轮询调度机制：
+为了确保事件语音目录下的音频播放更加丰富且分布均匀，[WeightedPicker](file:///home/duoyun/idea/idea/opencode-notification/app/shared/utils.ts) 采用权重轮询调度机制：
 
 ```mermaid
 graph TD
-    A[WeightManager 初始化] --> B[扫描音乐目录，获取音频列表]
+    A[WeightedPicker 初始化] --> B[扫描音频目录，获取音频列表]
     B --> C{本地是否存在 .weights.json 缓存?}
     C -- 是 --> D[加载上次保存的权重和已播放文件列表]
     C -- 否 --> E[初始化所有音频文件权重为默认值 100]

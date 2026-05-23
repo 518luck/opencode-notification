@@ -1,5 +1,11 @@
 import type { PluginInput } from "@opencode-ai/plugin";
-import { accessSync, constants as fsConstants, existsSync, mkdirSync, readdirSync } from "fs";
+import {
+  accessSync,
+  constants as fsConstants,
+  existsSync,
+  readdirSync,
+  statSync,
+} from "fs";
 import { delimiter, join } from "path";
 import {
   AUDIO_EXTENSIONS,
@@ -7,8 +13,8 @@ import {
   SYSTEM_BELL_FILES,
   SYSTEM_SOUND_PATHS,
 } from "../../shared/constants";
-import type { NotificationConfig } from "../../shared/types";
-import { WeightManager } from "./model/weight-manager";
+import type { EventConfig, NotificationConfig } from "../../shared/types";
+import { getEventConfig, WeightedPicker } from "../../shared/utils";
 
 // 查找系统自带的铃声音频文件（支持精准白名单匹配与目录扫描降级）
 function findSystemBell(): string | null {
@@ -35,11 +41,12 @@ function findSystemBell(): string | null {
   return null;
 }
 
-// 判断播放器命令是否存在且可执行，支持命令名和绝对路径
 function canRunCommand(command: string): boolean {
   const paths = command.includes("/")
     ? [command]
-    : (process.env.PATH || "").split(delimiter).map((dir) => join(dir, command));
+    : (process.env.PATH || "")
+        .split(delimiter)
+        .map((dir) => join(dir, command));
 
   for (const path of paths) {
     try {
@@ -53,25 +60,24 @@ function canRunCommand(command: string): boolean {
   return false;
 }
 
-// 创建并初始化声音通知器，准备自定义播放目录及权重管理器
+function isDir(path: string): boolean {
+  try {
+    return statSync(path).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+function resolvePath(pluginDir: string, raw: string): string {
+  return raw.startsWith("/") ? raw : join(pluginDir, raw);
+}
+
 export function createVoiceNotifier(
   $: PluginInput["$"],
   config: NotificationConfig,
   pluginDir: string,
 ) {
-  const musicsDir = join(
-    pluginDir,
-    config.voice.customVoice.musicsDir || "assets/sound",
-  );
-  if (!existsSync(musicsDir)) {
-    mkdirSync(musicsDir, { recursive: true });
-  }
-
-  const weightManager = new WeightManager(
-    musicsDir,
-    config.voice.decayFactor || 0.7,
-  );
-
+  const voicePickers = new Map<string, WeightedPicker>();
   let rememberedPlayer: string | null = null;
 
   function getPlayerCandidates(): string[] {
@@ -96,19 +102,18 @@ export function createVoiceNotifier(
   async function playAudioFile(filePath: string): Promise<boolean> {
     const candidates = getPlayerCandidates();
     const players = rememberedPlayer
-      ? [rememberedPlayer, ...candidates.filter((item) => item !== rememberedPlayer)]
+      ? [
+          rememberedPlayer,
+          ...candidates.filter((item) => item !== rememberedPlayer),
+        ]
       : candidates;
 
     for (const player of players) {
-      if (!canRunCommand(player)) {
-        continue;
-      }
+      if (!canRunCommand(player)) continue;
 
       const result = await runPlayer(player, filePath);
       if (result.exitCode === 0) {
-        if (rememberedPlayer !== player) {
-          rememberedPlayer = player;
-        }
+        rememberedPlayer = player;
         return true;
       }
     }
@@ -116,38 +121,55 @@ export function createVoiceNotifier(
     return false;
   }
 
-  // 播放自定义语音文件（根据权重比率挑选音频进行播放）
-  async function playCustomVoice() {
-    if (!config.voice.customVoice.enabled) return;
-    if (weightManager.getFiles().length === 0) return;
+  function resolveVoiceFile(eventCfg: EventConfig | null): {
+    filePath: string | null;
+    picked?: string;
+    picker?: WeightedPicker;
+  } {
+    if (!eventCfg?.voice) return { filePath: null };
 
-    const picked = weightManager.pick();
-    if (!picked) return;
+    const resolved = resolvePath(pluginDir, eventCfg.voice);
+    if (!existsSync(resolved)) return { filePath: null };
 
-    const filePath = join(musicsDir, picked);
-    const played = await playAudioFile(filePath);
-    if (played) weightManager.afterPlayed(picked);
+    if (!isDir(resolved)) return { filePath: resolved };
+
+    let picker = voicePickers.get(resolved);
+    if (!picker) {
+      picker = new WeightedPicker(
+        resolved,
+        AUDIO_EXTENSIONS,
+        config.voice.decayFactor ?? 0.7,
+      );
+      voicePickers.set(resolved, picker);
+    }
+
+    const picked = picker.pick();
+    if (!picked) return { filePath: null };
+
+    return { filePath: join(resolved, picked), picked, picker };
   }
 
-  // 播放系统默认铃声（若启用则查找并播放系统自带的提示音）
   async function playDefaultBell() {
-    if (!config.voice.defaultBell.enabled) return;
-
     const bellFile = findSystemBell();
     if (!bellFile) return;
 
     await playAudioFile(bellFile);
   }
 
-  // 声音通知的执行入口，根据配置的播放模式触发相应的音效播放
-  return async function notifyVoice() {
+  return async function notifyVoice(eventType: string) {
     if (!config.voice.enabled) return;
 
-    if (config.voice.mode === "custom") {
-      await playCustomVoice();
-    }
-    if (config.voice.mode === "default" || config.voice.defaultBell.enabled) {
+    const eventCfg = getEventConfig(config.events[eventType]);
+    const resolved = resolveVoiceFile(eventCfg);
+
+    if (!resolved.filePath) {
       await playDefaultBell();
+      return;
+    }
+
+    const played = await playAudioFile(resolved.filePath);
+    if (played && resolved.picker && resolved.picked) {
+      resolved.picker.afterPlayed(resolved.picked);
     }
   };
 }

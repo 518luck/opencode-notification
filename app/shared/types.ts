@@ -2,19 +2,22 @@ export interface EventConfig {
   enabled: boolean;
   icon?: string;
   image?: string;
+  voice?: string;
 }
 
 export interface NotificationConfig {
   enabled: boolean;
-  desktop: { enabled: boolean; showImage: boolean; imageDecayFactor: number; appName: string };
+  desktop: {
+    enabled: boolean;
+    showImage: boolean;
+    imageDecayFactor: number;
+    appName: string;
+  };
   toast: { enabled: boolean; variant: string };
   voice: {
     enabled: boolean;
-    mode: "custom" | "default";
     player: string;
     decayFactor: number;
-    defaultBell: { enabled: boolean };
-    customVoice: { enabled: boolean; musicsDir: string };
   };
-  events: Record<string, boolean | EventConfig>;
+  events: Record<string, EventConfig>;
 }

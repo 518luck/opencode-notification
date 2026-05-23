@@ -10,6 +10,9 @@ build/
 assets/sound/*
 !assets/sound/
 !assets/sound/default.mp3
+!assets/sound/*/
+assets/sound/*/*
+!assets/sound/*/.gitkeep
 
 
 assets/pictures/*

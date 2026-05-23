@@ -2,23 +2,8 @@ import type { PluginInput } from "@opencode-ai/plugin";
 import { existsSync, statSync } from "fs";
 import { join } from "path";
 import { EVENT_ICONS, IMAGE_EXTENSIONS } from "../../shared/constants";
-import { WeightedPicker } from "../../shared/utils";
+import { getEventConfig, isEventEnabled, WeightedPicker } from "../../shared/utils";
 import type { EventConfig } from "../../shared/types";
-
-type EventValue = boolean | EventConfig;
-
-// 判断该事件类型是否已启用通知
-function isEventEnabled(v: EventValue | undefined): boolean {
-  if (!v) return false;
-  if (typeof v === "boolean") return v;
-  return v.enabled;
-}
-
-// 获取事件的详细配置对象，若为布尔值或为空则返回 null
-function getEventConfig(v: EventValue | undefined): EventConfig | null {
-  if (!v || typeof v === "boolean") return null;
-  return v;
-}
 
 // 安全地判断给定的文件路径是否为一个目录
 function isDir(path: string): boolean {
@@ -32,7 +17,7 @@ function isDir(path: string): boolean {
 // 创建桌面通知器函数，初始化图片随机权重管理器
 export function createDesktopNotifier(
   $: PluginInput["$"],
-  events: Record<string, EventValue>,
+  events: Record<string, EventConfig>,
   desktopEnabled: boolean,
   showImage: boolean,
   imageDecayFactor: number,
@@ -120,5 +105,3 @@ export function createDesktopNotifier(
     } catch {}
   };
 }
-
-export { isEventEnabled, getEventConfig };
