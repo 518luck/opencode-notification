@@ -7,12 +7,8 @@ build/
 .env.*
 !.env.example
 
-assets/sound/*
-!assets/sound/
-!assets/sound/default.mp3
-!assets/sound/*/
-assets/sound/*/*
-!assets/sound/*/.gitkeep
-
+assets/sound/privacy/*
 
 assets/pictures/*
+
+docs/
