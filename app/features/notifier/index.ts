@@ -13,7 +13,7 @@ export function createNotifier(
   const { $, client, project } = input;
   const projectName =
     (project as any)?.name ||
-    (project as any).worktree.split(/[\\/]/).filter(Boolean).pop() ||
+    project?.worktree?.split(/[\\/]/).filter(Boolean).pop() ||
     "OpenCode";
   const sendDesktop = createDesktopNotifier(
     $,
