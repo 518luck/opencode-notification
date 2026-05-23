@@ -12,3 +12,5 @@ assets/sound/privacy/*
 assets/pictures/*
 
 docs/
+
+notification.config.jsonc
