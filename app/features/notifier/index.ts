@@ -11,6 +11,10 @@ export function createNotifier(
   pluginDir: string,
 ) {
   const { $, client, project } = input;
+  const projectName =
+    (project as any)?.name ||
+    (project as any).worktree.split(/[\\/]/).filter(Boolean).pop() ||
+    "OpenCode";
   const sendDesktop = createDesktopNotifier(
     $,
     config.events,
@@ -18,7 +22,7 @@ export function createNotifier(
     config.desktop.showImage,
     config.desktop.imageDecayFactor,
     config.desktop.appName,
-    project.name,
+    projectName,
     pluginDir,
   );
   const sendToast = createToastNotifier(client, config);
