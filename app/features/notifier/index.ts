@@ -6,6 +6,7 @@ import { isEventEnabled } from "../../shared/utils";
 import { createDesktopNotifier } from "./desktop";
 import { createToastNotifier } from "./toast";
 
+// 创建并初始化通知器实例，配置桌面、Toast 以及语音等通知通道
 export function createNotifier(
   input: Pick<PluginInput, "$" | "client" | "project">,
   config: NotificationConfig,
@@ -30,6 +31,7 @@ export function createNotifier(
   const notifyVoice = createVoiceNotifier($, config, pluginDir);
 
   return {
+    // 触发并发送指定事件类型的各类通知（桌面、Toast、语音）
     async notify(eventType: string) {
       if (!config.enabled) return;
       if (!isEventEnabled(config.events[eventType])) return;
