@@ -8,7 +8,7 @@ build/
 !.env.example
 
 assets/sound/privacy/*
-
+assets/sound/.weights.json
 assets/pictures/*
 
 docs/
