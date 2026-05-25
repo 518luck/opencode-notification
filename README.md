@@ -13,7 +13,7 @@
 - **Per-event 配置**：每个事件可独立配置图标、图片、语音路径
 - **权重随机 + 衰减**：文件夹模式下，避免重复播放同一文件
 - **播放器自动回退**：`pw-play` → `paplay` → `aplay` → `ffplay`，找到可用播放器后记住
-- **JSONC 配置**：支持注释和尾随逗号
+- **npm 安装**：一条命令安装，通过 `opencode.json` 配置
 
 ## 安装
 
@@ -29,105 +29,130 @@ sudo pacman -S libnotify pipewire-utils
 
 音频播放器至少安装其一：`pw-play`（推荐）、`paplay`、`aplay`、`ffplay`。
 
-### 2. 部署插件
+### 2. 安装插件
 
 ```bash
-# 克隆仓库
-git clone <repo-url> /path/to/opencode-notification
-
-# 创建软链接到 opencode 插件目录
-ln -s /path/to/opencode-notification ~/.config/opencode/plugins/notification
-
-# 创建配置文件
-cp notification.config.example.jsonc notification.config.jsonc
+npm install @duoyun/opencode-notification
+# 或
+pnpm add @duoyun/opencode-notification
 ```
 
-### 3. 重启 opencode
+### 3. 配置 opencode
 
-## 配置参考
-
-完整配置文件 `notification.config.jsonc`：
+在 `opencode.json` 中添加插件：
 
 ```jsonc
 {
-  // 总开关，false 时禁用所有通知通道
-  "enabled": true,
-
-  // 桌面弹窗通知（notify-send）
-  "desktop": {
-    "enabled": true,
-    // 是否显示左侧大图
-    "showImage": true,
-    // 图片随机权重衰减因子（0~1，越小衰减越快）
-    "imageDecayFactor": 0.7,
-    // 应用名称（显示在系统通知中心）
-    "appName": "OpenCode"
-  },
-
-  // TUI 内部 Toast 提示
-  "toast": {
-    "enabled": true,
-    // 样式：info / success / error
-    "variant": "info"
-  },
-
-  // 语音铃声通知
-  "voice": {
-    "enabled": true,
-    // 首选播放器：pw-play / paplay / aplay / ffplay
-    "player": "pw-play",
-    // 音频权重衰减因子（0~1）
-    "decayFactor": 0.7
-  },
-
-  // 按事件类型单独配置
-  "events": {
-    "permission.asked": {
-      "enabled": true,
-      "voice": "assets/sound/permission/"
-    },
-    "permission.updated": {
-      "enabled": true,
-      "voice": "assets/sound/permission/"
-    },
-    "question.asked": {
-      "enabled": true,
-      "voice": "assets/sound/question/"
-    },
-    "session.idle": {
-      "enabled": true,
-      "voice": "assets/sound/session-idle/"
-    },
-    "session.error": {
-      "enabled": true,
-      "voice": "assets/sound/session-error/"
-    }
-  }
+  "plugin": [
+    // 使用默认配置（开箱即用）
+    "@duoyun/opencode-notification"
+  ]
 }
 ```
 
-### 事件配置字段
+自定义配置：
+
+```jsonc
+{
+  "plugin": [
+    ["@duoyun/opencode-notification", {
+      // 总开关，false 时禁用所有通知通道
+      "enabled": true,
+
+      "desktop": {
+        "enabled": true,
+        "showImage": true,
+        "imageDecayFactor": 0.7,
+        "appName": "OpenCode"
+      },
+
+      "toast": {
+        "enabled": true,
+        "variant": "info"
+      },
+
+      "voice": {
+        "enabled": true,
+        "player": "pw-play",
+        "decayFactor": 0.7
+      },
+
+      "events": {
+        "session.idle": {
+          "enabled": true,
+          "image": "my-assets/idle/",
+          "voice": "my-assets/sounds/idle/"
+        }
+      }
+    }]
+  ]
+}
+```
+
+### 4. 重启 opencode
+
+## 配置参考
+
+### 顶层字段
+
+| 字段 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `enabled` | boolean | `true` | 总开关，false 时禁用所有通知通道 |
+| `desktop` | object | 见下方 | 桌面通知配置 |
+| `toast` | object | 见下方 | TUI Toast 配置 |
+| `voice` | object | 见下方 | 语音铃声配置 |
+| `events` | object | 见下方 | 按事件类型单独配置 |
+
+### desktop
+
+| 字段 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `enabled` | boolean | `true` | 是否启用桌面通知 |
+| `showImage` | boolean | `true` | 是否显示左侧大图 |
+| `imageDecayFactor` | number | `0.7` | 图片随机权重衰减因子（0~1） |
+| `appName` | string | `"OpenCode"` | 显示在系统通知中心的应用名称 |
+
+### toast
+
+| 字段 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `enabled` | boolean | `true` | 是否启用 TUI Toast |
+| `variant` | string | `"info"` | 样式：`info` / `success` / `error` |
+
+### voice
+
+| 字段 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `enabled` | boolean | `true` | 是否启用语音铃声 |
+| `player` | string | `"pw-play"` | 首选音频播放器 |
+| `decayFactor` | number | `0.7` | 音频权重衰减因子（0~1） |
+
+### events
+
+每个事件可配置：
 
 | 字段 | 类型 | 默认 | 说明 |
 |------|------|------|------|
 | `enabled` | boolean | `true` | 该事件是否通知 |
-| `icon` | string? | 自动 | 小图标路径，支持文件/文件夹/不填 |
-| `image` | string? | 自动 | 大图路径，支持文件/文件夹/不填 |
-| `voice` | string? | 系统铃声 | 音频路径，支持文件/文件夹/不填 |
+| `icon` | string? | 自动 | 小图标路径 |
+| `image` | string? | 自动 | 大图路径 |
+| `voice` | string? | 插件内置音频 | 音频路径 |
 
-### 路径三种写法
+### 路径写法
+
+`icon`、`image`、`voice` 的值支持三种写法：
 
 ```jsonc
-// 1. 单文件：直接使用
-"icon": "assets/icons/permission.svg"
+// 1. 绝对路径：直接使用
+"voice": "/home/user/sounds/bell.mp3"
 
-// 2. 文件夹：随机选取（带权重衰减）
-"image": "assets/pictures/climax/"
+// 2. 相对路径：优先查找项目目录，未找到则回退到插件内置资源
+"voice": "assets/sound/session-idle/"
 
-// 3. 不填：使用默认映射（icon/image）或系统铃声（voice）
-"icon": undefined  // → assets/icons/{eventName}.svg
-"voice": undefined // → 系统默认铃声
+// 3. 不填：使用默认映射（icon/image）或插件内置音频（voice）
 ```
+
+当路径指向文件夹时，会随机选取其中一个文件（带权重衰减）。
 
 ### 支持的扩展名
 
@@ -145,44 +170,6 @@ cp notification.config.example.jsonc notification.config.jsonc
 | `question.asked` | OpenCode 有问题需要你回答 | `choice` |
 | `session.idle` | 任务完成，等待你的输入 | `accomplish` |
 | `session.error` | 会话出错，请检查 | `error` |
-
-## 目录结构
-
-```
-opencode-notification/
-├── main.ts                    # 插件入口
-├── notification.config.jsonc  # 配置文件（gitignored）
-├── notification.config.example.jsonc  # 配置示例
-│
-├── app/
-│   ├── shared/
-│   │   ├── types.ts           # 配置类型接口
-│   │   ├── constants.ts       # 常量定义 + 默认配置
-│   │   └── utils.ts           # 配置加载 + WeightedPicker
-│   └── features/
-│       ├── notifier/
-│       │   ├── index.ts       # 通知分发中心
-│       │   ├── desktop.ts     # 桌面通知
-│       │   └── toast.ts       # TUI 弹窗
-│       └── sound/
-│           └── sound.ts       # 语音铃声
-│
-├── assets/
-│   ├── icons/                 # 默认 SVG 图标
-│   │   ├── accomplish.svg
-│   │   ├── choice.svg
-│   │   ├── error.svg
-│   │   └── permission.svg
-│   ├── pictures/              # 大图素材（gitignored）
-│   └── sound/                 # 音频素材（gitignored）
-│       ├── permission/        # 权限事件音频
-│       ├── question/          # 提问事件音频
-│       ├── session-idle/      # 空闲事件音频
-│       └── session-error/     # 错误事件音频
-│
-└── docs/                      # 文档
-    └── libnotify-reference.md # notify-send 参数参考
-```
 
 ## 权重随机机制
 
