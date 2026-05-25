@@ -1,15 +1,33 @@
 {
-  "name": "notification-plugins",
+  "name": "@duoyun/opencode-notification",
   "version": "1.0.0",
-  "description": "",
+  "description": "OpenCode notification plugin - desktop notifications, TUI toast, voice/sound alerts",
   "main": "main.ts",
+  "exports": {
+    ".": "./main.ts"
+  },
+  "files": [
+    "main.ts",
+    "app/",
+    "assets/icons/",
+    "assets/sound/"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "notification",
+    "desktop-notification",
+    "sound"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.33.0",
+  "peerDependencies": {
+    "@opencode-ai/plugin": "*"
+  },
   "devDependencies": {
     "@types/node": "^25.7.0"
   }

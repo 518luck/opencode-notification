@@ -14,9 +14,8 @@ import {
   SYSTEM_SOUND_PATHS,
 } from "../../shared/constants";
 import type { EventConfig, NotificationConfig } from "../../shared/types";
-import { getEventConfig, WeightedPicker } from "../../shared/utils";
+import { getEventConfig, resolveAssetPath, WeightedPicker } from "../../shared/utils";
 
-// 查找系统自带的铃声音频文件（支持精准白名单匹配与目录扫描降级）
 function findSystemBell(): string | null {
   for (const dir of SYSTEM_SOUND_PATHS) {
     if (!existsSync(dir)) continue;
@@ -41,7 +40,6 @@ function findSystemBell(): string | null {
   return null;
 }
 
-// 检查系统环境路径中是否存在并可执行指定的播放器命令
 function canRunCommand(command: string): boolean {
   const paths = command.includes("/")
     ? [command]
@@ -61,7 +59,6 @@ function canRunCommand(command: string): boolean {
   return false;
 }
 
-// 判断给定的文件路径是否为一个目录
 function isDir(path: string): boolean {
   try {
     return statSync(path).isDirectory();
@@ -70,21 +67,15 @@ function isDir(path: string): boolean {
   }
 }
 
-// 解析音频文件路径，若为相对路径则补全为绝对路径
-function resolvePath(pluginDir: string, raw: string): string {
-  return raw.startsWith("/") ? raw : join(pluginDir, raw);
-}
-
-// 创建并初始化语音通知器实例
 export function createVoiceNotifier(
   $: PluginInput["$"],
   config: NotificationConfig,
   pluginDir: string,
+  projectDir: string,
 ) {
   const voicePickers = new Map<string, WeightedPicker>();
   let rememberedPlayer: string | null = null;
 
-  // 获取已配置的播放器及系统预设的候选播放器列表
   function getPlayerCandidates(): string[] {
     const configured = config.voice.player?.trim();
     const candidates = configured
@@ -93,7 +84,6 @@ export function createVoiceNotifier(
     return Array.from(new Set(candidates.filter(Boolean)));
   }
 
-  // 调用指定的命令行播放器执行音频播放
   async function runPlayer(player: string, filePath: string) {
     if (player === "ffplay") {
       return await $`ffplay -nodisp -autoexit -loglevel quiet ${filePath}`
@@ -104,7 +94,6 @@ export function createVoiceNotifier(
     return await $`${player} ${filePath}`.quiet().nothrow();
   }
 
-  // 先用已记住的播放器；若不可用或播放失败，再按候选列表回退并重新记忆成功项
   async function playAudioFile(filePath: string): Promise<boolean> {
     const candidates = getPlayerCandidates();
     const players = rememberedPlayer
@@ -127,7 +116,6 @@ export function createVoiceNotifier(
     return false;
   }
 
-  // 解析事件对应的声音文件，若是目录则随机选择一个音频
   function resolveVoiceFile(eventCfg: EventConfig | null): {
     filePath: string | null;
     picked?: string;
@@ -135,7 +123,7 @@ export function createVoiceNotifier(
   } {
     if (!eventCfg?.voice) return { filePath: null };
 
-    const resolved = resolvePath(pluginDir, eventCfg.voice);
+    const resolved = resolveAssetPath(eventCfg.voice, pluginDir, projectDir);
     if (!existsSync(resolved)) return { filePath: null };
 
     if (!isDir(resolved)) return { filePath: resolved };
@@ -156,7 +144,6 @@ export function createVoiceNotifier(
     return { filePath: join(resolved, picked), picked, picker };
   }
 
-  // 查找并播放系统默认的通知铃声
   async function playDefaultBell() {
     const bellFile = findSystemBell();
     if (!bellFile) return;
@@ -164,7 +151,6 @@ export function createVoiceNotifier(
     await playAudioFile(bellFile);
   }
 
-  // 触发并执行事件对应的语音/铃声通知播放
   return async function notifyVoice(eventType: string) {
     if (!config.voice.enabled) return;
 

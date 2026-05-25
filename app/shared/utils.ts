@@ -119,29 +119,45 @@ function cloneDefaultConfig(): NotificationConfig {
   return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
 }
 
-function stripJsoncComments(content: string): string {
-  return content
-    .replace(/\/\/.*$/gm, "")
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/,\s*([}\]])/g, "$1");
-}
-
-function findConfigFile(dir: string): string | null {
-  const jsoncPath = join(dir, "notification.config.jsonc");
-  const jsonPath = join(dir, "notification.config.json");
-  if (existsSync(jsoncPath)) return jsoncPath;
-  if (existsSync(jsonPath)) return jsonPath;
-  return null;
-}
-
-export function loadNotificationConfig(pluginDir: string): NotificationConfig {
-  try {
-    const configPath = findConfigFile(pluginDir);
-    if (!configPath) throw new Error("config not found");
-
-    const raw = readFileSync(configPath, "utf-8");
-    return JSON.parse(stripJsoncComments(raw));
-  } catch {
-    return cloneDefaultConfig();
+export function deepMerge<T extends Record<string, any>>(
+  target: T,
+  source: Partial<T>,
+): T {
+  const result = { ...target } as Record<string, any>;
+  for (const key of Object.keys(source)) {
+    const srcVal = (source as Record<string, any>)[key];
+    const tgtVal = result[key];
+    if (
+      srcVal &&
+      typeof srcVal === "object" &&
+      !Array.isArray(srcVal) &&
+      tgtVal &&
+      typeof tgtVal === "object" &&
+      !Array.isArray(tgtVal)
+    ) {
+      result[key] = deepMerge(tgtVal, srcVal);
+    } else {
+      result[key] = srcVal;
+    }
   }
+  return result as T;
+}
+
+export function resolveAssetPath(
+  raw: string,
+  pluginDir: string,
+  projectDir: string,
+): string {
+  if (raw.startsWith("/")) return raw;
+  const projectPath = join(projectDir, raw);
+  if (existsSync(projectPath)) return projectPath;
+  return join(pluginDir, raw);
+}
+
+export function loadNotificationConfig(
+  options?: Partial<NotificationConfig>,
+): NotificationConfig {
+  const defaults = cloneDefaultConfig();
+  if (!options) return defaults;
+  return deepMerge(defaults, options);
 }
