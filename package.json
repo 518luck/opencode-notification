@@ -1,6 +1,6 @@
 {
   "name": "@duoyun/opencode-notification",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "OpenCode notification plugin - desktop notifications, TUI toast, voice/sound alerts",
   "main": "main.ts",
   "exports": {
