@@ -29,6 +29,7 @@ export const NotificationPlugin = (async (input, options) => {
   const config = loadNotificationConfig(options as Partial<NotificationConfig> | undefined);
   const projectDir = input.directory;
   const notifier = createNotifier(input, config, pluginDir, projectDir);
+  const subagentSessions = new Map<string, boolean>();
   let idleTimer: ReturnType<typeof setTimeout> | undefined;
   let suppressIdleUntil = 0;
 
@@ -38,6 +39,23 @@ export const NotificationPlugin = (async (input, options) => {
     idleTimer = undefined;
   }
 
+  async function isSubagentSession(sessionID: string): Promise<boolean> {
+    const cached = subagentSessions.get(sessionID);
+    if (cached !== undefined) return cached;
+
+    const session = await input.client.session
+      .get({
+        path: { id: sessionID },
+        query: { directory: input.directory },
+        throwOnError: true,
+      })
+      .catch(() => undefined);
+
+    const result = !!session?.data.parentID;
+    subagentSessions.set(sessionID, result);
+    return result;
+  }
+
   return {
     event: async ({ event }) => {
       const eventType = event.type;
@@ -45,6 +63,8 @@ export const NotificationPlugin = (async (input, options) => {
 
       if (eventType === "session.idle") {
         if (Date.now() < suppressIdleUntil) return;
+        if (await isSubagentSession(event.properties.sessionID)) return;
+
         cancelPendingIdle();
         idleTimer = setTimeout(() => {
           idleTimer = undefined;
